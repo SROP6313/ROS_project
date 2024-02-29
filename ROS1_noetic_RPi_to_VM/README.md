@@ -1,5 +1,5 @@
-## ROS1 Noetic Communication Setup: Raspberry Pi 4 & Ubuntu 20.04 in VirtualBox
-### Raspberry Pi 4:
+# ROS1 Noetic Communication Setup: Raspberry Pi 4 & Ubuntu 20.04 in VirtualBox
+## Raspberry Pi 4:
 * **Step 1** : Install OS [Debian/Raspbian Buster](https://downloads.raspberrypi.com/raspios_oldstable_armhf/images/raspios_oldstable_armhf-2023-05-03/) on Raspberry Pi 4
 * **Step 2** : Add the official ROS Debian repo to the OS
 ```
@@ -54,15 +54,63 @@ source /opt/ros/noetic/setup.bash
 roscore
 ```
 ---
-### Ubuntu 20.04 in VirtualBox:
+## Ubuntu 20.04 in VirtualBox:
 * **Step 1** : Install OS [Ubuntu 20.04 LTS](https://releases.ubuntu.com/20.04/) in VirtualBox
-* **Step 2** : 選擇此虛擬機->設定->網路->把預設的NAT改為橋接介面卡->選擇電腦連接的對應網卡
-* **Step 3** : 查看虛擬機與樹莓派的的ip與hostname
+### Install ROS Noetic
+* **Step 2** : Set up the ROS repository
+```
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu focal main" > /etc/apt/sources.list.d/ros-latest.list'
+```
+* **Step 3** : Set up the ROS key
+```
+sudo apt install curl
+curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+```
+* **Step 4** : Update the package lists
+```
+sudo apt update
+```
+* **Step 5** : Install ROS Noetic
+```
+sudo apt install ros-noetic-desktop
+```
+* **Step 6** : Initialize rosdep & Install rosinstall
+```
+sudo apt install python3-rosdep 
+sudo apt install python3-rosinstall 
+sudo apt install python3-rosinstall-generator 
+sudo apt install python3-wstool 
+sudo apt install build-essential
+sudo rosdep init
+rosdep update
+```
+* **Step 7** : Set up the ROS environment variables
+```
+echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+```
+* **Step 8** : Verify the installation
+```
+rosversion -d
+roswtf
+roscore
+```
+Open a new terminal and run
+```
+rosrun turtlesim turtlesim_node
+```
+Open another new terminal and run
+```
+rosrun turtlesim turtle_teleop_key
+```
+### Setup Communication with Raspberry Pi 4
+* **Step 9** : 選擇此虛擬機->設定->網路->把預設的NAT改為橋接介面卡->選擇電腦連接的對應網卡
+* **Step 10** : 查看虛擬機與樹莓派的的ip與hostname
 ```
 ifconfg
 hostname
 ```
-* **Step 4.1** : 虛擬機中運行`sudoedit /etc/hosts`打開檔案，添加下面箭頭那兩行 (__注意：ip與hostname之間一定要用Tab鍵__)
+* **Step 11.1** : 虛擬機中運行`sudoedit /etc/hosts`打開檔案，添加下面箭頭那兩行 (__注意：ip與hostname之間一定要用Tab鍵__)
 ```
 127.0.0.1       localhost
 127.0.1.1       eric-VirtualBox
@@ -76,7 +124,7 @@ ff00::0 ip6-mcastprefix
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 ```
-* **Step 4.2** : 樹莓派中運行`sudo nano /etc/hosts`打開檔案，添加下面兩行 (__注意：ip與hostname之間一定要用Tab鍵__)
+* **Step 11.2** : 樹莓派中運行`sudo nano /etc/hosts`打開檔案，添加下面兩行 (__注意：ip與hostname之間一定要用Tab鍵__)
 ```
 127.0.0.1       localhost
 192.168.43.216  eric-VirtualBox  <---
@@ -87,7 +135,7 @@ ff02::2         ip6-allrouters
 
 127.0.1.1               raspberrypi
 ```
-* **Step 5** : 雙方重啟網路
+* **Step 12** : 雙方重啟網路
 ```
 sudo /etc/init.d/networking restart
 ```
@@ -95,34 +143,34 @@ sudo /etc/init.d/networking restart
 ```
 sudo /etc/init.d/network-manager restart
 ```
-* **Step 6** : 雙方安裝Chrony
+* **Step 13** : 雙方安裝Chrony
 ```
 sudo apt-get install chrony
 ```
-* **Step 7** : 雙方安裝SSH
+* **Step 14** : 雙方安裝SSH
 ```
 sudo apt-get install openssh-server
 ```
-* **Step 8.1** : 虛擬機查看樹莓派網路連接
+* **Step 15.1** : 虛擬機查看樹莓派網路連接
 ```
 ping raspberrypi
 ```
-* **Step 8.2** : 樹莓派查看虛擬機網路連接
+* **Step 15.2** : 樹莓派查看虛擬機網路連接
 ```
 ping eric-VirtualBox
 ```
-* **Step 9.1** : 虛擬機添加環境變量，運行`sudoedit ~/.bashrc`，在檔案最底添加以下幾行 (__主機為樹莓派__)
+* **Step 16.1** : 虛擬機添加環境變量，運行`sudoedit ~/.bashrc`，在檔案最底添加以下幾行 (__主機為樹莓派__)
 ```
 source /opt/ros/noetic/setup.bash
 source ~/ros_catkin_ws/devel/setup.bash
 export ROS_HOSTNAME=eric-VirtualBox
 export ROS_MASTER_URI=http://raspberrypi:11311
 ```
-* **Step 9.2** : 樹莓派添加環境變量，運行`sudo nano ~/.bashrc`，在檔案最底添加以下幾行 (__主機為樹莓派__)
+* **Step 16.2** : 樹莓派添加環境變量，運行`sudo nano ~/.bashrc`，在檔案最底添加以下幾行 (__主機為樹莓派__)
 ```
 source /opt/ros/noetic/setup.bash
 source ~/ros_catkin_ws/devel/setup.bash
 export ROS_HOSTNAME=raspberrypi
 export ROS_MASTER_URI=http://raspberrypi:11311
 ```
-* **Step 10** : 樹莓派運行publisher節點，虛擬機運行`rostopic list`即可查看到發布的節點名稱
+* **Step 17** : 樹莓派運行publisher節點，虛擬機運行`rostopic list`即可查看到發布的節點名稱
