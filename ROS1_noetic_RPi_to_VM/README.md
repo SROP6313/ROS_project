@@ -56,6 +56,11 @@ roscore
 ---
 ## Ubuntu 20.04 in VirtualBox:
 * **Step 1** : Install OS [Ubuntu 20.04 LTS](https://releases.ubuntu.com/20.04/) in VirtualBox
+> * ***Extra*** : It is recommenced to install the new terminal app
+> ```
+> sudo apt install terminator
+> ```
+> Press Ctrl+Alt+T to open terminator
 ### Install ROS Noetic
 * **Step 2** : Set up the ROS repository
 ```bash
